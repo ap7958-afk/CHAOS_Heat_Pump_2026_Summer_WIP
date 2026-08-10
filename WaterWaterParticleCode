@@ -1,0 +1,197 @@
+// This #include statement was automatically added by the Particle IDE.
+#include <Adafruit_ADS1X15.h>
+
+// Argon Code
+// Include Particle Device OS APIs
+#include "Particle.h"
+#include <math.h>
+
+Adafruit_ADS1115 ads;
+
+int thermPin1 = A0;
+int thermPin2 = A1;
+int flowPin1 = A2;
+int flowPin2 = A4;
+int hotTankPin = A3;
+int coldTankPin = A5;
+
+double hotExp = 0;
+double outletTemp = 0;
+double coldExp = 0;
+double inletTemp = 0;
+double hotTank = 0;
+double coldTank = 0;
+int PWM = 0;
+int PWMPin = D2;
+int heatOn = 0;
+int waterState1 = LOW;
+int waterPWMPin1 = D8;
+int waterPWMState1 = 0;
+double flow1 = 0;
+int waterState2 = LOW;
+int waterPWMPin2 = D6;
+int waterPWMState2 = 0;
+double flow2 = 0;
+
+double inLineThermistor1 = 0;
+double inLineThermistor2 = 0;
+double inLineThermistor3 = 0;
+double inLineThermistor4 = 0;
+
+volatile uint32_t pulseCount1 = 0;
+unsigned long lastCalc1 = 0;
+
+volatile uint32_t pulseCount2 = 0;
+unsigned long lastCalc2 = 0;
+
+const float CAL_FACTOR = 450.0;
+
+
+float NTC_BETA          = 3977.0;  // β coefficient (K), B25/85
+float NTC_THERM_HOT     = 3385.0;  // β of black bulb thermistor for condensor
+float NTC_THERM_COLD    = 3470.0;  // β of black bulb thermistor for evaporator
+float NTC_INLINE        = 3950.0;
+float NTC_R0            = 10000.0; // Nominal resistance at T0 (Ω)
+float NTC_T0_K          = 298.15;  // Reference temp (K) = 25°C
+float NTC_RDIVIDER      = 10000.0; // Series resistor in voltage divider (Ω)
+
+
+// setup() runs once, when the device is first turned on
+void setup() {
+    
+    ads.begin();
+    ads.setGain(GAIN_TWOTHIRDS);
+    Particle.variable("inLineThermistor1", inLineThermistor1);
+    Particle.variable("inLineThermistor2", inLineThermistor2);
+    Particle.variable("inLineThermistor3", inLineThermistor3);
+    Particle.variable("inLineThermistor4", inLineThermistor4);
+    
+    Particle.variable("hotExp", hotExp);
+    Particle.variable("coldExp", coldExp);
+    Particle.variable("hotTank", hotTank);
+    Particle.variable("coldTank", coldTank);
+    Particle.variable("flow1", flow1);
+    Particle.variable("flow2", flow2);
+    Particle.variable("heatOn", heatOn);
+    
+    
+    pinMode(PWMPin, OUTPUT);
+    Particle.variable("PWM", PWM);
+    Particle.function("setPWM", setPWM);
+    
+    pinMode(waterPWMPin1, OUTPUT);
+    pinMode(flowPin1, INPUT_PULLUP);
+    attachInterrupt(flowPin1, countPulse1, RISING);
+    Particle.variable("waterState1", waterState1);
+    Particle.variable("waterPWMState1", waterPWMState1);
+    Particle.function("setWaterState1", setWaterState1);
+    
+    pinMode(waterPWMPin2, OUTPUT);
+    pinMode(flowPin2, INPUT_PULLUP);
+    attachInterrupt(flowPin2, countPulse2, RISING);
+    Particle.variable("waterState2", waterState2);
+    Particle.variable("waterPWMState2", waterPWMState2);
+    Particle.function("setWaterState2", setWaterState2);
+    
+}
+
+double readInLine(int pin) {
+    int val = ads.readADC_SingleEnded(pin);;
+    if (val <= 0 || val >= 17599) {
+        return NAN;
+    }
+    float R_ntc = NTC_RDIVIDER * ((float)val / (17599 - (float)val));
+    float invT  = (1.0 / NTC_T0_K) + (1.0 / NTC_THERM_HOT) * log(R_ntc / NTC_R0);
+    return (1.0 / invT) - 273.15;
+}
+
+double readRes(int pin) {
+    int raw = 0;
+    for (int x = 0; x < 100; x++) {
+        raw += analogRead(pin);
+    }
+    raw /= 100;
+    if (raw <= 0 || raw >= 4095) {
+        return NAN;
+    }
+    return NTC_RDIVIDER * ((float)raw / (4095.0 - (float)raw));
+}
+
+double readTemp(float R_ntc) {
+    float invT  = (1.0 / NTC_T0_K) + (1.0 / NTC_INLINE) * log(R_ntc / NTC_R0);
+    return (1.0 / invT) - 273.15;
+}
+
+int setPWM(String cmd) {
+    int percent = cmd.toInt();
+    PWM = map(percent, 0, 100, 0, 127);
+    if (PWM == 0) {
+        heatOn = LOW;
+    }
+    else {
+        heatOn = HIGH;
+    }
+    return PWM;
+}
+
+int setWaterState1(String cmd) {
+    int percent = cmd.toInt();
+    waterPWMState1 = map(percent, 0, 100, 0, 255);
+    if (percent == 0) {
+        waterState1 = LOW;
+    }
+    else {
+        waterState1 = HIGH;
+    }
+    return waterPWMState1;
+}
+
+int setWaterState2(String cmd) {
+    int percent = cmd.toInt();
+    waterPWMState2 = map(percent, 0, 100, 0, 255);
+    if (percent == 0) {
+        waterState2 = LOW;
+    }
+    else {
+        waterState2 = HIGH;
+    }
+    return waterPWMState2;
+}
+
+void countPulse1() {
+    pulseCount1++;
+}
+
+void countPulse2() {
+    pulseCount2++;
+}
+
+
+void loop() {
+  // The core of your code will likely live here.
+    hotExp = readTemp(readRes(thermPin1));
+    coldExp = readTemp(readRes(thermPin2));
+    hotTank = readTemp(readRes(hotTankPin));
+    coldTank = readTemp(readRes(coldTankPin));
+    inLineThermistor1 = readInLine(0);
+    inLineThermistor2 = readInLine(1);
+    inLineThermistor3 = readInLine(2);
+    inLineThermistor4 = readInLine(3);
+    if (millis() - lastCalc1 >= 1000) {
+        uint32_t count = pulseCount1;
+        flow1 = (count / CAL_FACTOR) * 60.0;
+        lastCalc1 = millis();
+        pulseCount1 = 0;
+    }
+    if (millis() - lastCalc2 >= 1000) {
+        uint32_t count = pulseCount2;
+        flow2 = (count / CAL_FACTOR) * 60.0;
+        lastCalc2 = millis();
+        pulseCount2 = 0;
+    }
+    analogWrite(waterPWMPin1, waterPWMState1);
+    analogWrite(waterPWMPin2, waterPWMState2);
+    analogWrite(PWMPin, PWM);
+    
+    delay(10);
+}
