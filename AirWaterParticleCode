@@ -1,0 +1,135 @@
+// Argon Code
+// Include Particle Device OS APIs
+// called samsungfinalsetupargonwaterpump in particle
+// but you can edit and flash this code as needed
+#include "Particle.h"
+#include <math.h>
+
+int thermPin1 = A0;
+int thermPin2 = A1;
+int thermPin3 = A2;
+int thermPin4 = A3;
+int thermPin5 = A4;
+int flowPin = A5;
+
+double hotExp = 0;
+double outletTemp = 0;
+double coldExp = 0;
+double inletTemp = 0;
+double hotRes = 0;
+double coldRes = 0;
+double tankTemp = 0;
+int PWM = 0;
+int PWMPin = D2;
+int heatOn = 0;
+int waterState = LOW;
+int waterPWMPin = D8;
+int waterPWMState = 0;
+double flow = 0;
+
+volatile uint32_t pulseCount = 0;
+unsigned long lastCalc = 0;
+const float CAL_FACTOR = 450.0;
+
+
+float NTC_BETA          = 3977.0;  // β coefficient (K), B25/85
+float NTC_THERM_HOT     = 3385.0;  // β of black bulb thermistor for condensor
+float NTC_THERM_COLD    = 3470.0;  // β of black bulb thermistor for evaporator
+float NTC_INLINE        = 3950.0;
+float NTC_R0            = 10000.0; // Nominal resistance at T0 (Ω)
+float NTC_T0_K          = 298.15;  // Reference temp (K) = 25°C
+float NTC_RDIVIDER      = 10000.0; // Series resistor in voltage divider (Ω)
+
+
+// setup() runs once, when the device is first turned on
+void setup() {
+    
+    Particle.variable("hotExp", hotExp);
+    Particle.variable("outletTemp", outletTemp);
+    Particle.variable("coldExp", coldExp);
+    Particle.variable("inletTemp", inletTemp);
+    Particle.variable("tankTemp", tankTemp);
+    Particle.variable("flow", flow);
+    Particle.variable("heatOn", heatOn);
+    
+    
+    
+    pinMode(PWMPin, OUTPUT);
+    Particle.variable("PWM", PWM);
+    Particle.function("setPWM", setPWM);
+    
+    pinMode(waterPWMPin, OUTPUT);
+    pinMode(flowPin, INPUT_PULLUP);
+    attachInterrupt(flowPin, countPulse, RISING);
+    Particle.variable("waterState", waterState);
+    Particle.variable("waterPWMState", waterPWMState);
+    Particle.function("setWaterState", setWaterState);
+    
+}
+
+double readRes(int pin) {
+    int raw = 0;
+    for (int x = 0; x < 100; x++) {
+        raw += analogRead(pin);
+    }
+    raw /= 100;
+    if (raw <= 0 || raw >= 4095) {
+        return NAN;
+    }
+    return NTC_RDIVIDER * ((float)raw / (4095.0 - (float)raw));
+}
+
+double readTemp(float R_ntc) {
+    float invT  = (1.0 / NTC_T0_K) + (1.0 / NTC_INLINE) * log(R_ntc / NTC_R0);
+    return (1.0 / invT) - 273.15;
+}
+
+int setPWM(String cmd) {
+    int percent = cmd.toInt();
+    if (percent > 100) {
+        percent = 100;
+    }
+    PWM = map(percent, 0, 100, 0, 94);
+    if (PWM == 0) {
+        heatOn = LOW;
+    }
+    else {
+        heatOn = HIGH;
+    }
+    return PWM;
+}
+
+int setWaterState(String cmd) {
+    int percent = cmd.toInt();
+    waterPWMState = map(percent, 0, 100, 0, 255);
+    if (percent == 0) {
+        waterState = LOW;
+    }
+    else {
+        waterState = HIGH;
+    }
+    return waterPWMState;
+}
+
+void countPulse() {
+    pulseCount++;
+}
+void loop() {
+  // The core of your code will likely live here.
+    hotRes = readRes(thermPin1);
+    hotExp = readTemp(hotRes);
+    outletTemp = readTemp(readRes(thermPin2));
+    coldRes = readRes(thermPin3);
+    coldExp = readTemp(coldRes);
+    tankTemp = readTemp(readRes(thermPin5));
+    inletTemp = readTemp(readRes(thermPin4));
+    if (millis() - lastCalc >= 1000) {
+        uint32_t count = pulseCount;
+        flow = (count / CAL_FACTOR) * 60.0;
+        lastCalc = millis();
+        pulseCount = 0;
+    }
+    analogWrite(waterPWMPin, waterPWMState);
+    analogWrite(PWMPin, PWM);
+    delay(10);
+}
