@@ -32,3 +32,8 @@ Here are the notable components:
 - Particle Argon (not currently in production, [Particle Photon 2](https://store.particle.io/products/photon-2?srsltid=AfmBOormM96f-gGhcssSqgBCRETDvYYhroR49By_eTcLEBIhuOg-hAsi) is the current version)
   - Brain of heat pump, sends and reads signals
   - Argon has more pwm (analog output) ports, meaning it can be more versatile for larger applications, but Photon 2s work great
+- [Water Flow Sensor](https://www.dataq.com/products/accessories/flow-sensor/2000362.html?srsltid=AfmBOoq0bn3iWQFa8eFH5_YkQTjOHRhhJWpElu4rLO7nA1srYfwZDjIk)
+  - measures pulses to get 0 to 30 L/min for water flow rate
+- Thermistors including [inline]([https://www.digikey.com/en/products/detail/amphenol-advanced-sensors/CTTS-302651-F01/14286333?gclsrc=aw.ds&gad_source=1&gad_campaignid=20232005509&gbraid=0AAAAADrbLlgvQ7MV4Exf-ZsCkKcIWOuGs&gclid=Cj0KCQjwkOvTBhDgARIsAKUNyRseuh1azDhaNEnpYsQ8uqiqO8TI01hdGPaBUENLiFC9RnPxA14sUIwaAqOIEALw_wcB](https://www.digikey.com/en/products/detail/amphenol-advanced-sensors-thermometrics-/GE-1935/5417957?gclsrc=aw.ds&gad_source=1&gad_campaignid=20232005509&gbraid=0AAAAADrbLlgvQ7MV4Exf-ZsCkKcIWOuGs&gclid=Cj0KCQjwkOvTBhDgARIsAKUNyRu-55_F3ruB34oLfby4-6fbjtvogGqapJtfJQJzqkRrsGprYrJwdLAaAnPuEALw_wcB)) and not [inline](https://www.amazon.com/Thermistor-Temperature-Sensor-Probe-Stainless/dp/B0DPJWGBVN?th=1)
+  - make a voltage divider circuit to read a signal that scales to resistance
+  - use that resistance with the steinhart equation to calculate temperature
