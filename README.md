@@ -29,3 +29,5 @@ Here are the notable components:
 - [PWM to Analog Converter](https://tinkersphere.com/electronic-components/2980-pwm-to-analog-converter-module.html?srsltid=AfmBOoqBeFCTH-jJtcLuXnP2rVsC9qjX1O_KOffNygqXqgoI-gh9lbyM0jI)
   - Used to modulate output voltage from either 0-3.3 V or 10 V (can switch using the little shunt resistor on the PCB)
   - Clean signal, is used to modulate heat pump speed
+- Particle Argon (not currently in production, [Particle Photon 2](https://store.particle.io/products/photon-2?srsltid=AfmBOormM96f-gGhcssSqgBCRETDvYYhroR49By_eTcLEBIhuOg-hAsi) is the current version)
+  - Brain of heat pump, sends and reads signals
