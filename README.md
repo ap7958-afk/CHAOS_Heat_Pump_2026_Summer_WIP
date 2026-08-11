@@ -31,3 +31,4 @@ Here are the notable components:
   - Clean signal, is used to modulate heat pump speed
 - Particle Argon (not currently in production, [Particle Photon 2](https://store.particle.io/products/photon-2?srsltid=AfmBOormM96f-gGhcssSqgBCRETDvYYhroR49By_eTcLEBIhuOg-hAsi) is the current version)
   - Brain of heat pump, sends and reads signals
+  - Argon has more pwm (analog output) ports, meaning it can be more versatile for larger applications, but Photon 2s work great
