@@ -2,16 +2,13 @@
 
 Welcome! This repository covers my design process for the heat pumps I made during summer 2026 at Princeton University. The goal of this repo is to
 1. Show how I built the electrical system from start to finish
-2. Add files for the low and high level code needed to control the heat pump (low for particle operation, high level for openBOS operation) 
-3. Show how to setup up other essential components of the heat pump like the water tanks
-5. Allow for those interested in building miniature heat pump systems to have a guide on the systems and controls side of it
-
-# Part 1: Electronics
-
-In this section, I will cover the physical layout of the circuitry, along with a guide on the parts.
+2. Add files for the low and high level code needed to control the heat pump
+3. Allow for those interested in building miniature heat pump systems to have a guide on the systems and controls side of it
 
 First, here is an image of the air-water heat pump's circuitry:
 <img width="4032" height="3024" alt="Heat Pump Circuitry" src="https://github.com/user-attachments/assets/ad885113-26b2-4dd8-8313-b50ac99cac92" />
+Here it is as a schematic:
+<img width="974" height="683" alt="Screenshot 2026-08-28 at 9 19 40 AM" src="https://github.com/user-attachments/assets/980c633f-73c2-4cc2-9144-2ac0580689b5" />
 Here are the notable components:
 - [Screw Terminal](https://www.amazon.com/YUKKOEOQ-Positions-Pre-Insulated-Insulated-Connector/dp/B0FFGVBY26/ref=pd_sbs_d_sccl_1_1/146-4497402-1289054?pd_rd_w=0murg&content-id=amzn1.sym.aa738fbd-ad05-4d11-aae2-04b598db6305&pf_rd_p=aa738fbd-ad05-4d11-aae2-04b598db6305&pf_rd_r=T772Q91SB8AHZTSWFTEZ&pd_rd_wg=QfdGC&pd_rd_r=d543f15e-7fd4-438a-b933-3fefb6fb9d84&pd_rd_i=B0FFGVBY26&th=1)
   - This acts as the main power distribution for my circuit. Every device is directly connected to the 24 V screw terminal. The only exceptions include the particle argon, which accepts up to 5 V via its buck converter, along with the many 12 V devices, which use another type of screw terminal (which works similarly).
@@ -34,7 +31,12 @@ Here are the notable components:
   - Argon has more pwm (analog output) ports, meaning it can be more versatile for larger applications, but Photon 2s work great
 - [Water Flow Sensor](https://www.dataq.com/products/accessories/flow-sensor/2000362.html?srsltid=AfmBOoq0bn3iWQFa8eFH5_YkQTjOHRhhJWpElu4rLO7nA1srYfwZDjIk)
   - measures pulses to get 0 to 30 L/min for water flow rate
-- Thermistors including [inline](https://www.digikey.com/en/products/detail/amphenol-advanced-sensors-thermometrics-/GE-1935/5417957?gclsrc=aw.ds&gad_source=1&gad_campaignid=20232005509&gbraid=0AAAAADrbLlgvQ7MV4Exf-ZsCkKcIWOuGs&gclid=Cj0KCQjwkOvTBhDgARIsAKUNyRu-55_F3ruB34oLfby4-6fbjtvogGqapJtfJQJzqkRrsGprYrJwdLAaAnPuEALw_wcB) and not [inline](https://www.amazon.com/Thermistor-Temperature-Sensor-Probe-Stainless/dp/B0DPJWGBVN?th=1)
+- Thermistors including [inline](https://www.digikey.com/en/products/detail/amphenol-advanced-sensors-thermometrics-/GE-1935/5417957?gclsrc=aw.ds&gad_source=1&gad_campaignid=20232005509&gbraid=0AAAAADrbLlgvQ7MV4Exf-ZsCkKcIWOuGs&gclid=Cj0KCQjwkOvTBhDgARIsAKUNyRu-55_F3ruB34oLfby4-6fbjtvogGqapJtfJQJzqkRrsGprYrJwdLAaAnPuEALw_wcB) and [not inline](https://www.amazon.com/Thermistor-Temperature-Sensor-Probe-Stainless/dp/B0DPJWGBVN?th=1)
   - make a voltage divider circuit to read a signal that scales to resistance
-  - use that resistance with the steinhart equation to calculate temperature
+  - use that resistance with the Steinhart equation to calculate temperature
+Notes:
+- Use 16 AWG wire, especially for compressor components
+- Test component voltages with a multimeter and by sending out signals
+
+Once finished, in the particle IDE, add a new file, paste the AirWaterParticleCode in, and flash. I would recommend testing signals to see if you get the desired outputs before hooking up directly
 
