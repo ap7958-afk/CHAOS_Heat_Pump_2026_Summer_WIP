@@ -1,0 +1,28 @@
+import os
+import sys
+import bospy as bos
+import numpy as np
+import time
+
+# control
+compressorSet = "bos://localhost/dev/25/pts/1"
+hotWaterSet = "bos://localhost/dev/25/pts/3"
+coldWaterSet = "bos://localhost/dev/25/pts/4"
+BSSWaterSet = "bos://localhost/dev/16/pts/1"
+BSSFanSet = "bos://localhost/dev/15/pts/4"
+valveRadPanel = "bos://localhost/dev/16/pts/3"
+valveSlab = "bos://localhost/dev/16/pts/6"
+valveFanCoil = "bos://localhost/dev/16/pts/5"
+airDamper = "bos://localhost/dev/15/pts/6"
+airMixer = "bos://localhost/dev/15/pts/5"
+
+bos.set(compressorSet, 0)
+bos.set(hotWaterSet, 0)
+bos.set(coldWaterSet, 0)
+bos.set(BSSWaterSet, 0)
+bos.set(BSSFanSet, 0)
+bos.set(valveRadPanel, 10)
+bos.set(valveSlab, 10)
+bos.set(valveFanCoil, 10)
+bos.set(airDamper, 0)
+bos.set(airMixer, 0)
