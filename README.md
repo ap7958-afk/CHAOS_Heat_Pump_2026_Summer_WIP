@@ -40,3 +40,19 @@ Notes:
 
 Once finished, in the particle IDE, add a new file, paste the AirWaterParticleCode in, and flash. I would recommend testing signals to see if you get the desired outputs before hooking up directly
 
+Operation instructions:
+- Samsung (Air Water Pump)
+1. Turn on water pump to 100, until you see or hear the water flowing.
+2. Set the heat pump to 54 to turn on.
+3. You can adjust the water pump speed from anywhere between 50-100.
+4. After a minimum of one minute of the pump being on (3 is recommended), you can adjust the heat pump speed from 50-100. Do not go lower, as this may cause the pump to turn off.
+5. If you want to turn off the heat pump, set it to 0, then turn the water pumps to 0.
+6. If you want to run again, either unplug and replug, or wait for a minute.
+7. 
+- Aspen (Water Water Pump)
+1. Turn on water pumps to 100, until you see or hear the water flowing.
+2. Set the heat pump to 20 to turn on.
+3. You can adjust the water pump speed from anywhere between 50-100.
+4. After a minimum of one minute of the pump being on, you can adjust the heat pump speed from 20-100. Do not go lower, as this may cause the pump to turn off.
+5. If you want to turn off the heat pump, set it to 0, then turn the water pumps to 0.
+6. If you want to run again, either unplug and replug, or wait for a minute.
