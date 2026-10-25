@@ -40,6 +40,17 @@ Notes:
 
 Once finished, in the particle IDE, add a new file, paste the AirWaterParticleCode in, and flash. I would recommend testing signals to see if you get the desired outputs before hooking up directly
 
+Water to Water Pump Diagrams
+<img width="1212" height="623" alt="image" src="https://github.com/user-attachments/assets/b06d9ac9-f3b7-433f-9702-64be1e123a92" />
+The image above is a high level graph of the main circuitry, it contains all the main components
+<img width="1140" height="825" alt="Screenshot 2026-10-25 at 6 55 51 PM" src="https://github.com/user-attachments/assets/fa965392-a1e4-46b6-98f6-3216f6096ac3" />
+This first image shows the argon block at a greater level of depth
+<img width="704" height="386" alt="image" src="https://github.com/user-attachments/assets/7ac1f26a-af80-4306-af64-9c183f56a15b" />
+The last image shows the mosfets and its connections
+
+Use the tags given to track where wires go
+
+
 Operation instructions:
 - Samsung (Air Water Pump)
 1. Turn on water pump to 100, until you see or hear the water flowing.
